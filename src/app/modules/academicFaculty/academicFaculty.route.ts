@@ -7,7 +7,11 @@ const router = express.Router();
 
 router.get('/', AcademicFacultyController.getAllFacultyData);
 router.get('/:id', AcademicFacultyController.getSingleFaculty);
-router.patch('/:id', AcademicFacultyController.updateOneInDB);
+router.patch(
+  '/:id',
+  validateRequest(AcademicFacultyValidation.update),
+  AcademicFacultyController.updateOneInDB
+);
 router.delete('/:id', AcademicFacultyController.deleteFaculty);
 
 router.post(

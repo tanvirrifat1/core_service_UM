@@ -9,7 +9,7 @@ router.get('/', AcademicDepartmentController.getAllFromDB);
 router.get('/:id', AcademicDepartmentController.getByIdFromDB);
 
 router.post(
-  '/',
+  '/create-department',
   validateRequest(AcademicDepartmentValidation.create),
   AcademicDepartmentController.insertIntoDB
 );

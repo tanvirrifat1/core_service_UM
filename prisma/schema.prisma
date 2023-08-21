@@ -59,7 +59,7 @@ model Student {
   middleName   String
   profileImage String
   email        String
-  contactNo    Int
+  contactNo    String
   gender       String
   bloodGroup   String
   createdAt    DateTime @default(now())
