@@ -48,8 +48,20 @@ const getSingleFaculty = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateOneInDB = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.params.id;
+  const result = await academicFacultyService.updatedFaculty(userId, req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'AcademicFaculty updated successfully',
+    data: result,
+  });
+});
+
 export const AcademicFacultyController = {
   interIntoDb,
   getAllFacultyData,
   getSingleFaculty,
+  updateOneInDB,
 };
