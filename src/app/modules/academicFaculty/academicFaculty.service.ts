@@ -95,9 +95,19 @@ const updatedFaculty = async (
   return result;
 };
 
+const deleteFaculty = async (id: string): Promise<AcademicFaculty | null> => {
+  const result = await prisma.academicFaculty.delete({
+    where: {
+      id: id,
+    },
+  });
+  return result;
+};
+
 export const academicFacultyService = {
   interIntoDb,
   getAllFacultyData,
   getSingleFaculty,
   updatedFaculty,
+  deleteFaculty,
 };

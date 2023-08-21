@@ -59,9 +59,21 @@ const updateOneInDB = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const deleteFaculty = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.params.id;
+  const result = await academicFacultyService.deleteFaculty(userId);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'AcademicFaculty deleted successfully',
+    data: result,
+  });
+});
+
 export const AcademicFacultyController = {
   interIntoDb,
   getAllFacultyData,
   getSingleFaculty,
   updateOneInDB,
+  deleteFaculty,
 };
