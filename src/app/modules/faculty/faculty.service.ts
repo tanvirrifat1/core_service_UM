@@ -88,7 +88,17 @@ const getAllFaculty = async (
   };
 };
 
+const getSingleFaculty = async (id: string): Promise<Faculty | null> => {
+  const result = await prisma.faculty.findUnique({
+    where: {
+      id: id,
+    },
+  });
+  return result;
+};
+
 export const FacultyService = {
   interIntoDb,
   getAllFaculty,
+  getSingleFaculty,
 };

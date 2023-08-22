@@ -31,7 +31,19 @@ const getAllFaculty = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getSingleFaculty = catchAsync(async (req: Request, res: Response) => {
+  const result = await FacultyService.getSingleFaculty(req.params.id);
+
+  sendResponse<Faculty>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'single Faculty fetched successfully',
+    data: result,
+  });
+});
+
 export const FacultyController = {
   interIntoDb,
   getAllFaculty,
+  getSingleFaculty,
 };
