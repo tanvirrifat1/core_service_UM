@@ -93,6 +93,10 @@ const getSingleFaculty = async (id: string): Promise<Faculty | null> => {
     where: {
       id: id,
     },
+    include: {
+      academicFaculty: true,
+      academicDepartment: true,
+    },
   });
   return result;
 };
@@ -106,6 +110,10 @@ const updatedFaculty = async (
       id: id,
     },
     data: payload,
+    include: {
+      academicFaculty: true,
+      academicDepartment: true,
+    },
   });
   return result;
 };
@@ -114,6 +122,10 @@ const deletedFaculty = async (id: string): Promise<Faculty | null> => {
   const result = await prisma.faculty.delete({
     where: {
       id: id,
+    },
+    include: {
+      academicFaculty: true,
+      academicDepartment: true,
     },
   });
   return result;
