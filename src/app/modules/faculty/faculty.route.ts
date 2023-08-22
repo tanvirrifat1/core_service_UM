@@ -7,6 +7,12 @@ const router = express.Router();
 
 router.get('/', FacultyController.getAllFaculty);
 router.get('/:id', FacultyController.getSingleFaculty);
+router.patch(
+  '/:id',
+  validateRequest(FacultyValidation.update),
+  FacultyController.updatedFaculty
+);
+router.delete('/:id', FacultyController.deletedFaculty);
 
 router.post(
   '/create-faculty',

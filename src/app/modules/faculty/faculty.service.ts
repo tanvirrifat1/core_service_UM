@@ -97,8 +97,32 @@ const getSingleFaculty = async (id: string): Promise<Faculty | null> => {
   return result;
 };
 
+const updatedFaculty = async (
+  id: string,
+  payload: Partial<Faculty>
+): Promise<Faculty | null> => {
+  const result = await prisma.faculty.update({
+    where: {
+      id: id,
+    },
+    data: payload,
+  });
+  return result;
+};
+
+const deletedFaculty = async (id: string): Promise<Faculty | null> => {
+  const result = await prisma.faculty.delete({
+    where: {
+      id: id,
+    },
+  });
+  return result;
+};
+
 export const FacultyService = {
   interIntoDb,
   getAllFaculty,
   getSingleFaculty,
+  updatedFaculty,
+  deletedFaculty,
 };

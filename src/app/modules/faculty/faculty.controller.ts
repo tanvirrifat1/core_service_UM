@@ -42,8 +42,32 @@ const getSingleFaculty = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updatedFaculty = catchAsync(async (req: Request, res: Response) => {
+  const result = await FacultyService.updatedFaculty(req.params.id, req.body);
+
+  sendResponse<Faculty>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'updated Faculty successfully',
+    data: result,
+  });
+});
+
+const deletedFaculty = catchAsync(async (req: Request, res: Response) => {
+  const result = await FacultyService.deletedFaculty(req.params.id);
+
+  sendResponse<Faculty>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Faculty deleted successfully',
+    data: result,
+  });
+});
+
 export const FacultyController = {
   interIntoDb,
   getAllFaculty,
   getSingleFaculty,
+  updatedFaculty,
+  deletedFaculty,
 };
