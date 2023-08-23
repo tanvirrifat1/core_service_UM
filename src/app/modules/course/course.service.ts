@@ -132,7 +132,17 @@ const getAllFromDB = async (
   };
 };
 
+const getSingleDataFromDb = async (id: string): Promise<Course | null> => {
+  const result = await prisma.course.findUnique({
+    where: {
+      id: id,
+    },
+  });
+  return result;
+};
+
 export const CourseService = {
   insertIntoDb,
   getAllFromDB,
+  getSingleDataFromDb,
 };

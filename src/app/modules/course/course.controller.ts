@@ -33,7 +33,20 @@ const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getSingleDataFromDb = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await CourseService.getSingleDataFromDb(id);
+
+  sendResponse<Course>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'single course fetched successfully',
+    data: result,
+  });
+});
+
 export const CourseController = {
   insertIntoDb,
   getAllFromDB,
+  getSingleDataFromDb,
 };
