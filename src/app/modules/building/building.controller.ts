@@ -1,3 +1,4 @@
+import { Buidling } from '@prisma/client';
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 import catchAsync from '../../../shared/catchAsync';
@@ -23,7 +24,7 @@ const getAllFromDb = catchAsync(async (req: Request, res: Response) => {
   const options = pick(req.query, ['page', 'limit', 'sortBy', 'sortOrder']);
 
   const result = await BuildingService.getAllFromDb(filters, options);
-  sendResponse(res, {
+  sendResponse<Buidling[]>(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Building fetched successfully!',
@@ -32,7 +33,31 @@ const getAllFromDb = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getSingleDB = catchAsync(async (req: Request, res: Response) => {
+  const result = await BuildingService.getSingleDB(req.params.id);
+  sendResponse<Buidling>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Single Building Fetched successfully!',
+    data: result,
+  });
+});
+
+const updateDb = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.params.id;
+  const payload = req.body;
+  const result = await BuildingService.updateDb(userId, payload);
+  sendResponse<Buidling>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Building updated successfully!',
+    data: result,
+  });
+});
+
 export const BuildingController = {
   insertIntoDB,
   getAllFromDb,
+  getSingleDB,
+  updateDb,
 };

@@ -13,6 +13,19 @@ router.post(
   validateRequest(BuildingValidation.create),
   BuildingController.insertIntoDB
 );
+
+router.patch(
+  '/:id',
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  BuildingController.updateDb
+);
+
+router.get(
+  '/:id',
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  BuildingController.getSingleDB
+);
+
 router.get('/', BuildingController.getAllFromDb);
 
 export const BuildingRoutes = router;

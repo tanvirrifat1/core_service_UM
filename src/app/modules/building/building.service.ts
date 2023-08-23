@@ -60,7 +60,27 @@ const getAllFromDb = async (
   };
 };
 
+const getSingleDB = async (id: string): Promise<Buidling | null> => {
+  const result = await prisma.buidling.findUnique({
+    where: { id },
+  });
+  return result;
+};
+
+const updateDb = async (
+  id: string,
+  payload: Partial<Buidling>
+): Promise<Buidling | null> => {
+  const result = await prisma.buidling.update({
+    where: { id },
+    data: payload,
+  });
+  return result;
+};
+
 export const BuildingService = {
   insertIntoDB,
   getAllFromDb,
+  getSingleDB,
+  updateDb,
 };
