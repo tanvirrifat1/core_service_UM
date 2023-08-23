@@ -55,9 +55,21 @@ const updateDb = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const deleteDB = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.params.id;
+  const result = await BuildingService.deleteDB(userId);
+  sendResponse<Buidling>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Building deleted successfully!',
+    data: result,
+  });
+});
+
 export const BuildingController = {
   insertIntoDB,
   getAllFromDb,
   getSingleDB,
   updateDb,
+  deleteDB,
 };

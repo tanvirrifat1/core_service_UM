@@ -78,9 +78,17 @@ const updateDb = async (
   return result;
 };
 
+const deleteDB = async (id: string): Promise<Buidling | null> => {
+  const result = await prisma.buidling.delete({
+    where: { id },
+  });
+  return result;
+};
+
 export const BuildingService = {
   insertIntoDB,
   getAllFromDb,
   getSingleDB,
   updateDb,
+  deleteDB,
 };
