@@ -58,9 +58,22 @@ const updatedData = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const deleteData = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await CourseService.deleteData(id);
+
+  sendResponse<Course>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'course delete successfully',
+    data: result,
+  });
+});
+
 export const CourseController = {
   insertIntoDb,
   getAllFromDB,
   getSingleDataFromDb,
   updatedData,
+  deleteData,
 };

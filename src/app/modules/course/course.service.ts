@@ -135,7 +135,19 @@ const getAllFromDB = async (
 const getSingleDataFromDb = async (id: string): Promise<Course | null> => {
   const result = await prisma.course.findUnique({
     where: {
-      id: id,
+      id,
+    },
+    include: {
+      PreRequisite: {
+        include: {
+          preRequisite: true,
+        },
+      },
+      PreRequisiteFor: {
+        include: {
+          course: true,
+        },
+      },
     },
   });
   return result;
@@ -154,9 +166,32 @@ const updatedData = async (
   return result;
 };
 
+const deleteData = async (id: string): Promise<Course> => {
+  await prisma.courseToPrerequisite.deleteMany({
+    where: {
+      OR: [
+        {
+          courseId: id,
+        },
+        {
+          preRequisiteId: id,
+        },
+      ],
+    },
+  });
+
+  const result = await prisma.course.delete({
+    where: {
+      id,
+    },
+  });
+  return result;
+};
+
 export const CourseService = {
   insertIntoDb,
   getAllFromDB,
   getSingleDataFromDb,
   updatedData,
+  deleteData,
 };
