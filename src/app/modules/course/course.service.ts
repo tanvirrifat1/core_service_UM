@@ -141,8 +141,22 @@ const getSingleDataFromDb = async (id: string): Promise<Course | null> => {
   return result;
 };
 
+const updatedData = async (
+  id: string,
+  payload: Partial<Course>
+): Promise<Course | null> => {
+  const result = await prisma.course.update({
+    where: {
+      id: id,
+    },
+    data: payload,
+  });
+  return result;
+};
+
 export const CourseService = {
   insertIntoDb,
   getAllFromDB,
   getSingleDataFromDb,
+  updatedData,
 };
