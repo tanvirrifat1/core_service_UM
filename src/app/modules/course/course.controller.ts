@@ -19,15 +19,13 @@ const insertIntoDb = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
-  const filters = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
-  const options = pick(req.query, courseFilterableFields);
-
+  const filters = pick(req.query, courseFilterableFields);
+  const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
   const result = await CourseService.getAllFromDB(filters, options);
-
-  sendResponse<Course[]>(res, {
+  sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Course fetched successfully',
+    message: 'Courses fetched successfully',
     meta: result.meta,
     data: result.data,
   });
