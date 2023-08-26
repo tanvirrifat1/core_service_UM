@@ -27,5 +27,11 @@ router.post(
   validateRequest(CourseValidation.create),
   CourseController.insertIntoDb
 );
+router.post(
+  '/:id/assign-faculties',
+  // auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+
+  CourseController.assignFaculies
+);
 
 export const CourseRouter = router;

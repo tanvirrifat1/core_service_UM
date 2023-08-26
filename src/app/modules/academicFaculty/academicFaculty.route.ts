@@ -23,7 +23,7 @@ router.delete(
 
 router.post(
   '/create-academicFaculty',
-  auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  // auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
   validateRequest(AcademicFacultyValidation.create),
   AcademicFacultyController.interIntoDb
 );
