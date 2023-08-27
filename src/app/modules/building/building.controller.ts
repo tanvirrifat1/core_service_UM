@@ -1,4 +1,4 @@
-import { Buidling } from '@prisma/client';
+import { Building } from '@prisma/client';
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 import catchAsync from '../../../shared/catchAsync';
@@ -24,7 +24,7 @@ const getAllFromDb = catchAsync(async (req: Request, res: Response) => {
   const options = pick(req.query, ['page', 'limit', 'sortBy', 'sortOrder']);
 
   const result = await BuildingService.getAllFromDb(filters, options);
-  sendResponse<Buidling[]>(res, {
+  sendResponse<Building[]>(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Building fetched successfully!',
@@ -35,7 +35,7 @@ const getAllFromDb = catchAsync(async (req: Request, res: Response) => {
 
 const getSingleDB = catchAsync(async (req: Request, res: Response) => {
   const result = await BuildingService.getSingleDB(req.params.id);
-  sendResponse<Buidling>(res, {
+  sendResponse<Building>(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Single Building Fetched successfully!',
@@ -47,7 +47,7 @@ const updateDb = catchAsync(async (req: Request, res: Response) => {
   const userId = req.params.id;
   const payload = req.body;
   const result = await BuildingService.updateDb(userId, payload);
-  sendResponse<Buidling>(res, {
+  sendResponse<Building>(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Building updated successfully!',
@@ -58,7 +58,7 @@ const updateDb = catchAsync(async (req: Request, res: Response) => {
 const deleteDB = catchAsync(async (req: Request, res: Response) => {
   const userId = req.params.id;
   const result = await BuildingService.deleteDB(userId);
-  sendResponse<Buidling>(res, {
+  sendResponse<Building>(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Building deleted successfully!',

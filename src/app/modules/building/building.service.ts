@@ -1,12 +1,12 @@
-import { Buidling, Prisma } from '@prisma/client';
+import { Building, Prisma } from '@prisma/client';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
 import { prisma } from '../../../shared/prisma';
 import { IBuildingFilterRequest } from './building.interface';
 
-const insertIntoDB = async (data: Buidling): Promise<Buidling> => {
-  const result = await prisma.buidling.create({
+const insertIntoDB = async (data: Building): Promise<Building> => {
+  const result = await prisma.building.create({
     data,
   });
   return result;
@@ -15,7 +15,7 @@ const insertIntoDB = async (data: Buidling): Promise<Buidling> => {
 const getAllFromDb = async (
   filters: IBuildingFilterRequest,
   options: IPaginationOptions
-): Promise<IGenericResponse<Buidling[]>> => {
+): Promise<IGenericResponse<Building[]>> => {
   const { page, limit, skip } = paginationHelpers.calculatePagination(options);
 
   const { searchTerm } = filters;
@@ -33,10 +33,10 @@ const getAllFromDb = async (
     });
   }
 
-  const whereConditions: Prisma.BuidlingWhereInput =
+  const whereConditions: Prisma.BuildingWhereInput =
     andConditions.length > 0 ? { AND: andConditions } : {};
 
-  const result = await prisma.buidling.findMany({
+  const result = await prisma.building.findMany({
     skip,
     take: limit,
     where: whereConditions,
@@ -49,7 +49,7 @@ const getAllFromDb = async (
             createdAt: 'desc',
           },
   });
-  const total = await prisma.buidling.count({ where: whereConditions });
+  const total = await prisma.building.count({ where: whereConditions });
   return {
     meta: {
       page,
@@ -60,8 +60,8 @@ const getAllFromDb = async (
   };
 };
 
-const getSingleDB = async (id: string): Promise<Buidling | null> => {
-  const result = await prisma.buidling.findUnique({
+const getSingleDB = async (id: string): Promise<Building | null> => {
+  const result = await prisma.building.findUnique({
     where: { id },
   });
   return result;
@@ -69,17 +69,17 @@ const getSingleDB = async (id: string): Promise<Buidling | null> => {
 
 const updateDb = async (
   id: string,
-  payload: Partial<Buidling>
-): Promise<Buidling | null> => {
-  const result = await prisma.buidling.update({
+  payload: Partial<Building>
+): Promise<Building | null> => {
+  const result = await prisma.building.update({
     where: { id },
     data: payload,
   });
   return result;
 };
 
-const deleteDB = async (id: string): Promise<Buidling | null> => {
-  const result = await prisma.buidling.delete({
+const deleteDB = async (id: string): Promise<Building | null> => {
+  const result = await prisma.building.delete({
     where: { id },
   });
   return result;
