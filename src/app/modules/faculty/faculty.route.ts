@@ -27,4 +27,7 @@ router.post(
   FacultyController.interIntoDb
 );
 
+router.post('/:id/assign-courses', FacultyController.assignCourses);
+router.delete('/:id/remove-courses', FacultyController.removeCourses);
+
 export const FacultyRouter = router;
