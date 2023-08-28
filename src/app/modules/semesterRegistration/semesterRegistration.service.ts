@@ -115,7 +115,33 @@ const getAllFromDB = async (
   };
 };
 
+const getSingleSemester = async (
+  id: string
+): Promise<SemesterRegistration | null> => {
+  const result = await prisma.semesterRegistration.findUnique({
+    where: { id },
+    include: {
+      academicSemester: true,
+    },
+  });
+  return result;
+};
+
+const deleteSemester = async (
+  id: string
+): Promise<SemesterRegistration | null> => {
+  const result = await prisma.semesterRegistration.delete({
+    where: { id },
+    include: {
+      academicSemester: true,
+    },
+  });
+  return result;
+};
+
 export const SemesterRegistrationService = {
   insertIntoDb,
   getAllFromDB,
+  getSingleSemester,
+  deleteSemester,
 };

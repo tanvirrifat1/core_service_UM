@@ -6,6 +6,8 @@ import { SemesterRegistrationValidation } from './semesterRegistration.validatio
 const router = express.Router();
 
 router.get('/', SemesterRegistrationController.getAllSemester);
+router.get('/:id', SemesterRegistrationController.getSingleSemester);
+router.delete('/:id', SemesterRegistrationController.deleteSemester);
 
 router.post(
   '/create-semester',
