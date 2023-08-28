@@ -133,7 +133,7 @@ CREATE TABLE "semester_registration" (
     "id" TEXT NOT NULL,
     "startDate" TIMESTAMP(3) NOT NULL,
     "endDate" TIMESTAMP(3) NOT NULL,
-    "status" "SemesterRegistrationStatus",
+    "status" "SemesterRegistrationStatus" DEFAULT 'UPCOMING',
     "minCredit" INTEGER NOT NULL DEFAULT 0,
     "maxCredit" INTEGER NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -141,6 +141,18 @@ CREATE TABLE "semester_registration" (
     "academicSemesterId" TEXT NOT NULL,
 
     CONSTRAINT "semester_registration_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "offeres_courses" (
+    "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "courseId" TEXT NOT NULL,
+    "academicDepartmentId" TEXT NOT NULL,
+    "semesterRegistrationId" TEXT NOT NULL,
+
+    CONSTRAINT "offeres_courses_pkey" PRIMARY KEY ("id")
 );
 
 -- AddForeignKey
@@ -178,3 +190,12 @@ ALTER TABLE "course_faculties" ADD CONSTRAINT "course_faculties_facultyId_fkey" 
 
 -- AddForeignKey
 ALTER TABLE "semester_registration" ADD CONSTRAINT "semester_registration_academicSemesterId_fkey" FOREIGN KEY ("academicSemesterId") REFERENCES "academic_semesters"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "offeres_courses" ADD CONSTRAINT "offeres_courses_courseId_fkey" FOREIGN KEY ("courseId") REFERENCES "courses"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "offeres_courses" ADD CONSTRAINT "offeres_courses_academicDepartmentId_fkey" FOREIGN KEY ("academicDepartmentId") REFERENCES "academic_departments"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "offeres_courses" ADD CONSTRAINT "offeres_courses_semesterRegistrationId_fkey" FOREIGN KEY ("semesterRegistrationId") REFERENCES "semester_registration"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
