@@ -8,7 +8,11 @@ const router = express.Router();
 router.get('/', SemesterRegistrationController.getAllSemester);
 router.get('/:id', SemesterRegistrationController.getSingleSemester);
 router.delete('/:id', SemesterRegistrationController.deleteSemester);
-router.patch('/:id', SemesterRegistrationController.updateSemester);
+router.patch(
+  '/:id',
+  validateRequest(SemesterRegistrationValidation.update),
+  SemesterRegistrationController.updateSemester
+);
 
 router.post(
   '/create-semester',
