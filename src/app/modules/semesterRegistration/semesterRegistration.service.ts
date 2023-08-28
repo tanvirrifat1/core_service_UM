@@ -34,6 +34,12 @@ const insertIntoDb = async (
   return result;
 };
 
+const getAllSemester = async (): Promise<SemesterRegistration[]> => {
+  const result = await prisma.semesterRegistration.findMany();
+  return result;
+};
+
 export const SemesterRegistrationService = {
   insertIntoDb,
+  getAllSemester,
 };
