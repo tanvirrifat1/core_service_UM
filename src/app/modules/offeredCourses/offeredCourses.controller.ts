@@ -33,4 +33,46 @@ const getAllFromDb = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-export const OfferedCourseController = { insertIntoDB, getAllFromDb };
+const getSingleData = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await OfferedCourseService.getSingleData(id);
+
+  sendResponse<OfferedCourse | null>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Get single OfferedCourse successfully!',
+    data: result,
+  });
+});
+
+const updatedData = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await OfferedCourseService.updatedData(id, req.body);
+
+  sendResponse<OfferedCourse | null>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Updated OfferedCourse successfully!',
+    data: result,
+  });
+});
+
+const deleteData = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await OfferedCourseService.deleteData(id);
+
+  sendResponse<OfferedCourse | null>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Deleted OfferedCourse successfully!',
+    data: result,
+  });
+});
+
+export const OfferedCourseController = {
+  insertIntoDB,
+  getAllFromDb,
+  getSingleData,
+  updatedData,
+  deleteData,
+};
