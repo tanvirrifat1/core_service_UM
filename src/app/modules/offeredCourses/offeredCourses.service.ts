@@ -1,3 +1,4 @@
+import { OfferedCourse } from '@prisma/client';
 import { prisma } from '../../../shared/prisma';
 import { asyncForEach } from '../../../shared/utils';
 import { ICreateOfferedCourse } from './offeredCourses.interface';
@@ -5,17 +6,30 @@ import { ICreateOfferedCourse } from './offeredCourses.interface';
 const insertIntoDB = async (data: ICreateOfferedCourse) => {
   const { courseIds, academicDepartmentId, semesterRegistrationId } = data;
 
-  const result: any[] = [];
+  const result: OfferedCourse[] = [];
 
   await asyncForEach(courseIds, async (courseId: string) => {
-    const insertOfferedCoursed = await prisma.offeredCourse.create({
-      data: {
-        academicDepartmentId,
-        semesterRegistrationId,
-        courseId,
-      },
+    const alreadyExist = await prisma.offeredCourse.findFirst({
+      where: { academicDepartmentId, semesterRegistrationId, courseId },
     });
-    result.push(insertOfferedCoursed);
+
+    if (!alreadyExist) {
+      const insertOfferedCoursed = await prisma.offeredCourse.create({
+        data: {
+          academicDepartmentId,
+          semesterRegistrationId,
+          courseId,
+        },
+        include: {
+          academicDepartment: true,
+          semesterRegistration: true,
+          course: true,
+        },
+      });
+      result.push(insertOfferedCoursed);
+    } else if (alreadyExist) {
+      throw new Error('This data is already exist');
+    }
   });
   return result;
 };
