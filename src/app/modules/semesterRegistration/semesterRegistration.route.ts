@@ -1,4 +1,6 @@
 import express from 'express';
+import { ENUM_USER_ROLE } from '../../../enums/user';
+import auth from '../../middlewares/auth';
 import validateRequest from '../../middlewares/validateRequest';
 import { SemesterRegistrationController } from './semesterRegistration.controller';
 import { SemesterRegistrationValidation } from './semesterRegistration.validation';
@@ -18,6 +20,15 @@ router.post(
   '/create-semester',
   validateRequest(SemesterRegistrationValidation.create),
   SemesterRegistrationController.insertIntoDb
+);
+
+// --------------------//
+// studentSemesterRegistration
+
+router.post(
+  '/start-registration',
+  auth(ENUM_USER_ROLE.STUDENT),
+  SemesterRegistrationController.StartMyRegistration
 );
 
 export const SemesterRegistrationRoutes = router;

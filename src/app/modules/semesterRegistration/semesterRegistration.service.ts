@@ -184,10 +184,62 @@ const updateSemester = async (
   return result;
 };
 
+// --------------------//
+// studentSemesterRegistration
+const StartMyRegistration = async (authUserId: string) => {
+  const studentInfo = await prisma.student.findFirst({
+    where: { studentId: authUserId },
+  });
+
+  if (!studentInfo) {
+    throw new ApiError(
+      httpStatus.BAD_GATEWAY,
+      'Student information not found!'
+    );
+  }
+
+  const semesterRegistrationInfo = await prisma.semesterRegistration.findFirst({
+    where: {
+      status: {
+        in: [
+          SemesterRegistrationStatus.ONGOING,
+          SemesterRegistrationStatus.UPCOMING,
+        ],
+      },
+    },
+  });
+
+  if (
+    semesterRegistrationInfo?.status === SemesterRegistrationStatus.UPCOMING
+  ) {
+    throw new ApiError(
+      httpStatus.BAD_GATEWAY,
+      'Registration is not started yet!'
+    );
+  }
+
+  const semesterRegistration = await prisma.studentSemesterRegistration.create({
+    data: {
+      student: {
+        connect: {
+          id: studentInfo?.id,
+        },
+      },
+      semesterRegistration: {
+        connect: {
+          id: semesterRegistrationInfo?.id,
+        },
+      },
+    },
+  });
+  return semesterRegistration;
+};
+
 export const SemesterRegistrationService = {
   insertIntoDb,
   getAllFromDB,
   getSingleSemester,
   deleteSemester,
   updateSemester,
+  StartMyRegistration,
 };
