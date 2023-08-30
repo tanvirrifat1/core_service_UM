@@ -9,16 +9,16 @@ export const asyncForEach = async (array: any[], callback: any) => {
   }
 };
 
-export const hasTimeConflict = (
+const hasTimeConflict = (
   existingSlots: {
     startTime: string;
     endTime: string;
-    dayOfWeek: WeekDays;
+    dayOfWeek: WeekDays | null;
   }[],
   newSlot: {
     startTime: string;
     endTime: string;
-    dayOfWeek: WeekDays;
+    dayOfWeek: WeekDays | null;
   }
 ) => {
   for (const slot of existingSlots) {
@@ -33,3 +33,5 @@ export const hasTimeConflict = (
   }
   return false;
 };
+
+export default hasTimeConflict;

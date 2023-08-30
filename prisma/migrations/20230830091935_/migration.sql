@@ -1,6 +1,9 @@
 -- CreateEnum
 CREATE TYPE "SemesterRegistrationStatus" AS ENUM ('UPCOMING', 'ONGOING', 'ENDED');
 
+-- CreateEnum
+CREATE TYPE "WeekDays" AS ENUM ('SATURDAY', 'SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY');
+
 -- CreateTable
 CREATE TABLE "academic_semesters" (
     "id" TEXT NOT NULL,
@@ -155,6 +158,36 @@ CREATE TABLE "offeres_courses" (
     CONSTRAINT "offeres_courses_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "offered_courses_section" (
+    "id" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "maxCapacity" INTEGER NOT NULL,
+    "currentlyEnrolledStudent" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "offeredCourseId" TEXT NOT NULL,
+    "semesterRegistrationId" TEXT NOT NULL,
+
+    CONSTRAINT "offered_courses_section_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "OfferedCourseClassSchedule" (
+    "id" TEXT NOT NULL,
+    "startTime" TEXT NOT NULL,
+    "endTime" TEXT NOT NULL,
+    "dayOfWeek" "WeekDays" DEFAULT 'SATURDAY',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "offeredCourseSectionId" TEXT NOT NULL,
+    "semesterRegistrationId" TEXT NOT NULL,
+    "roomId" TEXT NOT NULL,
+    "facultyId" TEXT NOT NULL,
+
+    CONSTRAINT "OfferedCourseClassSchedule_pkey" PRIMARY KEY ("id")
+);
+
 -- AddForeignKey
 ALTER TABLE "academic_departments" ADD CONSTRAINT "academic_departments_academicFacultyId_fkey" FOREIGN KEY ("academicFacultyId") REFERENCES "academic_faculty"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -199,3 +232,21 @@ ALTER TABLE "offeres_courses" ADD CONSTRAINT "offeres_courses_academicDepartment
 
 -- AddForeignKey
 ALTER TABLE "offeres_courses" ADD CONSTRAINT "offeres_courses_semesterRegistrationId_fkey" FOREIGN KEY ("semesterRegistrationId") REFERENCES "semester_registration"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "offered_courses_section" ADD CONSTRAINT "offered_courses_section_offeredCourseId_fkey" FOREIGN KEY ("offeredCourseId") REFERENCES "offeres_courses"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "offered_courses_section" ADD CONSTRAINT "offered_courses_section_semesterRegistrationId_fkey" FOREIGN KEY ("semesterRegistrationId") REFERENCES "semester_registration"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "OfferedCourseClassSchedule" ADD CONSTRAINT "OfferedCourseClassSchedule_offeredCourseSectionId_fkey" FOREIGN KEY ("offeredCourseSectionId") REFERENCES "offered_courses_section"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "OfferedCourseClassSchedule" ADD CONSTRAINT "OfferedCourseClassSchedule_semesterRegistrationId_fkey" FOREIGN KEY ("semesterRegistrationId") REFERENCES "semester_registration"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "OfferedCourseClassSchedule" ADD CONSTRAINT "OfferedCourseClassSchedule_roomId_fkey" FOREIGN KEY ("roomId") REFERENCES "rooms"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "OfferedCourseClassSchedule" ADD CONSTRAINT "OfferedCourseClassSchedule_facultyId_fkey" FOREIGN KEY ("facultyId") REFERENCES "faculties"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

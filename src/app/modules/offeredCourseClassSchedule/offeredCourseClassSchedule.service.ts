@@ -1,36 +1,28 @@
-import { OfferedCourseClassSchedule } from '@prisma/client';
+import { OfferedCourseClassSchedule, Prisma } from '@prisma/client';
 import httpStatus from 'http-status';
 import ApiError from '../../../errors/ApiError';
+import { paginationHelpers } from '../../../helpers/paginationHelper';
+import { IGenericResponse } from '../../../interfaces/common';
+import { IPaginationOptions } from '../../../interfaces/pagination';
 import { prisma } from '../../../shared/prisma';
-import { hasTimeConflict } from '../../../shared/utils';
+import {
+  OfferedCourseClassScheduleSearchableFields,
+  offeredCourseClassScheduleRelationalFields,
+  offeredCourseClassScheduleRelationalFieldsMapper,
+} from './offeredCourseClassSchedule.contants';
+import { IOfferedCourseClassScheduleFilterRequest } from './offeredCourseClassSchedule.interface';
+import { OfferedCourseClassScheduleUtils } from './offeredCourseClassSchedule.ultis';
 
 const insertIntoDB = async (
   data: OfferedCourseClassSchedule
 ): Promise<OfferedCourseClassSchedule> => {
-  const alreadyBookedRoomOnDay =
-    await prisma.offeredCourseClassSchedule.findMany({
-      where: {
-        dayOffWeek: data.dayOffWeek,
-        room: {
-          id: data.roomId,
-        },
-      },
-    });
+  await OfferedCourseClassScheduleUtils.checkRoomAvaileAble(data);
 
-  const existingSlots = alreadyBookedRoomOnDay.map(schedule => ({
-    startTime: schedule.startTime,
-    endTime: schedule.endTime,
-    dayOfWeek: schedule.dayOffWeek,
-  }));
-
-  const newSlots = {
-    startTime: data.startTime,
-    endTime: data.endTime,
-    dayOfWeek: data.dayOffWeek,
-  };
-
-  if (hasTimeConflict(existingSlots, newSlots)) {
-    throw new ApiError(httpStatus.CONFLICT, 'Room is already booked');
+  if (data.startTime > data.endTime) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'start time should les then endTime'
+    );
   }
 
   const result = await prisma.offeredCourseClassSchedule.create({
@@ -45,4 +37,79 @@ const insertIntoDB = async (
   return result;
 };
 
-export const OfferedCourseClassScheduleService = { insertIntoDB };
+const getAllFromDB = async (
+  filters: IOfferedCourseClassScheduleFilterRequest,
+  options: IPaginationOptions
+): Promise<IGenericResponse<OfferedCourseClassSchedule[]>> => {
+  const { limit, page, skip } = paginationHelpers.calculatePagination(options);
+  const { searchTerm, ...filterData } = filters;
+
+  const andConditions = [];
+
+  if (searchTerm) {
+    andConditions.push({
+      OR: OfferedCourseClassScheduleSearchableFields.map(field => ({
+        [field]: {
+          contains: searchTerm,
+          mode: 'insensitive',
+        },
+      })),
+    });
+  }
+
+  if (Object.keys(filterData).length > 0) {
+    andConditions.push({
+      AND: Object.keys(filterData).map(key => {
+        if (offeredCourseClassScheduleRelationalFields.includes(key)) {
+          return {
+            [offeredCourseClassScheduleRelationalFieldsMapper[key]]: {
+              id: (filterData as any)[key],
+            },
+          };
+        } else {
+          return {
+            [key]: {
+              equals: (filterData as any)[key],
+            },
+          };
+        }
+      }),
+    });
+  }
+
+  const whereConditions: Prisma.OfferedCourseClassScheduleWhereInput =
+    andConditions.length > 0 ? { AND: andConditions } : {};
+
+  const result = await prisma.offeredCourseClassSchedule.findMany({
+    where: whereConditions,
+    take: limit,
+    skip,
+    include: {
+      faculty: true,
+      offeredCourseSection: true,
+      room: true,
+      semesterRegistration: true,
+    },
+    orderBy:
+      options.sortBy && options.sortOrder
+        ? { [options.sortBy]: options.sortOrder }
+        : {
+            createdAt: 'desc',
+          },
+  });
+
+  const total = await prisma.offeredCourseClassSchedule.count({
+    where: whereConditions,
+  });
+
+  return {
+    meta: {
+      limit,
+      page,
+      total,
+    },
+    data: result,
+  };
+};
+
+export const OfferedCourseClassScheduleService = { insertIntoDB, getAllFromDB };

@@ -225,12 +225,12 @@ model OfferedCourseSection {
 }
 
 model OfferedCourseClassSchedule {
-  id         String    @id @default(uuid())
-  startTime  String
-  endTime    String
-  dayOffWeek WeekDays? @default(SATURDAY)
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  id        String    @id @default(uuid())
+  startTime String
+  endTime   String
+  dayOfWeek WeekDays? @default(SATURDAY)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   offeredCourseSectionId String
   offeredCourseSection   OfferedCourseSection @relation(fields: [offeredCourseSectionId], references: [id])
