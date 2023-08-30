@@ -17,6 +17,7 @@ const insertIntoDB = async (
   data: OfferedCourseClassSchedule
 ): Promise<OfferedCourseClassSchedule> => {
   await OfferedCourseClassScheduleUtils.checkRoomAvaileAble(data);
+  await OfferedCourseClassScheduleUtils.checkFacultyAvailable(data);
 
   if (data.startTime > data.endTime) {
     throw new ApiError(
