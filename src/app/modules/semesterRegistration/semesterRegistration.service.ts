@@ -2,6 +2,7 @@ import {
   Prisma,
   SemesterRegistration,
   SemesterRegistrationStatus,
+  StudentSemesterRegistration,
 } from '@prisma/client';
 import httpStatus from 'http-status';
 import ApiError from '../../../errors/ApiError';
@@ -186,7 +187,12 @@ const updateSemester = async (
 
 // --------------------//
 // studentSemesterRegistration
-const StartMyRegistration = async (authUserId: string) => {
+const StartMyRegistration = async (
+  authUserId: string
+): Promise<{
+  semesterRegistration: SemesterRegistration | null;
+  studentSemesterRegistration: StudentSemesterRegistration | null;
+}> => {
   const studentInfo = await prisma.student.findFirst({
     where: { studentId: authUserId },
   });
@@ -218,21 +224,42 @@ const StartMyRegistration = async (authUserId: string) => {
     );
   }
 
-  const semesterRegistration = await prisma.studentSemesterRegistration.create({
-    data: {
+  // else if (semesterRegistration) {
+  //   throw new ApiError(httpStatus.BAD_GATEWAY, 'already exist data!');
+  // }
+
+  let studentRegistration = await prisma.studentSemesterRegistration.findFirst({
+    where: {
       student: {
-        connect: {
-          id: studentInfo?.id,
-        },
+        id: studentInfo?.id,
       },
       semesterRegistration: {
-        connect: {
-          id: semesterRegistrationInfo?.id,
-        },
+        id: semesterRegistrationInfo?.id,
       },
     },
   });
-  return semesterRegistration;
+
+  if (!studentRegistration) {
+    studentRegistration = await prisma.studentSemesterRegistration.create({
+      data: {
+        student: {
+          connect: {
+            id: studentInfo?.id,
+          },
+        },
+        semesterRegistration: {
+          connect: {
+            id: semesterRegistrationInfo?.id,
+          },
+        },
+      },
+    });
+  }
+
+  return {
+    semesterRegistration: semesterRegistrationInfo,
+    studentSemesterRegistration: studentRegistration,
+  };
 };
 
 export const SemesterRegistrationService = {
