@@ -1,3 +1,4 @@
+import { OfferedCourseClassSchedule } from '@prisma/client';
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 import catchAsync from '../../../shared/catchAsync';
@@ -9,7 +10,7 @@ import { OfferedCourseClassScheduleService } from './offeredCourseClassSchedule.
 const insertIntoDB = catchAsync(async (req: Request, res: Response) => {
   const result = await OfferedCourseClassScheduleService.insertIntoDB(req.body);
 
-  sendResponse(res, {
+  sendResponse<OfferedCourseClassSchedule>(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'OfferedCourseClassSchedule created successfully',
@@ -26,7 +27,7 @@ const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
     options
   );
 
-  sendResponse(res, {
+  sendResponse<OfferedCourseClassSchedule[]>(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'OfferedCourseClassSchedule fetched successfully',
