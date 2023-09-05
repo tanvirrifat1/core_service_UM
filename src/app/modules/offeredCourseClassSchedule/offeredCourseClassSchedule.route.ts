@@ -3,6 +3,7 @@ import { OfferedCourseClassScheduleController } from './offeredCourseClassSchedu
 
 const router = express.Router();
 
+router.get('/:id', OfferedCourseClassScheduleController.getByIdFromDB);
 router.get('/', OfferedCourseClassScheduleController.getAllFromDB);
 router.post('/create', OfferedCourseClassScheduleController.insertIntoDB);
 

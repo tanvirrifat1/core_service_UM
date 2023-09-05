@@ -36,7 +36,19 @@ const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getByIdFromDB = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await OfferedCourseClassScheduleService.getByIdFromDB(id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'OfferedCourseClassSchedule fetched successfully',
+    data: result,
+  });
+});
+
 export const OfferedCourseClassScheduleController = {
   insertIntoDB,
   getAllFromDB,
+  getByIdFromDB,
 };
