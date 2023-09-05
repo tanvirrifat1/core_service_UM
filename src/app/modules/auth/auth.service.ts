@@ -12,6 +12,11 @@ const createUser = async (data: User): Promise<User> => {
   return result;
 };
 
+const getUsers = async (): Promise<User[]> => {
+  const result = await prisma.user.findMany();
+  return result;
+};
+
 const signIn = async (payload: ISignInData): Promise<ISignInResponse> => {
   const { password, email } = payload;
 
@@ -21,8 +26,6 @@ const signIn = async (payload: ISignInData): Promise<ISignInResponse> => {
       password,
     },
   });
-
-  console.log(isUserExist, 'isjknksf');
 
   if (!isUserExist) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'user not found!');
@@ -41,4 +44,5 @@ const signIn = async (payload: ISignInData): Promise<ISignInResponse> => {
 export const AuthService = {
   signIn,
   createUser,
+  getUsers,
 };
