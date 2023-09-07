@@ -282,25 +282,45 @@ const enrollIntoCourse = async (
     },
   });
 
-  if (!student) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'student not found!');
-  }
-  if (!semesterRegistration) {
-    throw new ApiError(
-      httpStatus.BAD_REQUEST,
-      'semesterRegistration not found!'
-    );
-  }
-
-  const enrollCourse = await prisma.studentSemesterRegistrationCourse.create({
-    data: {
-      studentId: student?.id,
-      semesterRegistrationId: semesterRegistration?.id,
-      offeredCourseId: payload.offeredCourseId,
-      offeredCourseSectionId: payload.offeredCourseSectionId,
+  const offeredCourse = await prisma.offeredCourse.findFirst({
+    where: {
+      id: payload.offeredCourseId,
     },
   });
-  return enrollCourse;
+
+  const offeredCourseSection = await prisma.offeredCourse.findFirst({
+    where: {
+      id: payload.offeredCourseSectionId,
+    },
+  });
+
+  if (!offeredCourseSection) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'offeredCourseSection not found!');
+  }
+
+  if (!offeredCourse) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'offeredCourse not found!');
+  }
+
+  if (!student) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'student not found!');
+  }
+  if (!semesterRegistration) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'semesterRegistration not found!');
+  }
+
+  await prisma.$transaction(async transactionClient => {
+    await transactionClient.studentSemesterRegistrationCourse.create({
+      data: {
+        studentId: student?.id,
+        semesterRegistrationId: semesterRegistration?.id,
+        offeredCourseId: payload.offeredCourseId,
+        offeredCourseSectionId: payload.offeredCourseSectionId,
+      },
+    });
+  });
+
+  return {};
 };
 
 export const SemesterRegistrationService = {
