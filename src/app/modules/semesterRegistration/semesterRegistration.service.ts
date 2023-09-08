@@ -10,8 +10,9 @@ import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
 import { prisma } from '../../../shared/prisma';
+import { StudentSemesterRegistrationCourse } from '../studentSemesterRegistrationCourse/studentSemesterRegistrationCourse.service';
 import {
-  IEnrolledCoursed,
+  IEnrollCoursePayload,
   ISemesterRegistrationFilterRequest,
 } from './semesterRegistration.interface';
 import {
@@ -267,71 +268,26 @@ const StartMyRegistration = async (
 
 const enrollIntoCourse = async (
   authUserId: string,
-  payload: IEnrolledCoursed
-) => {
-  const student = await prisma.student.findFirst({
-    where: {
-      studentId: authUserId,
-    },
-  });
-  // console.log(student);
+  payload: IEnrollCoursePayload
+): Promise<{
+  message: string;
+}> => {
+  return StudentSemesterRegistrationCourse.enrollIntoCourse(
+    authUserId,
+    payload
+  );
+};
 
-  const semesterRegistration = await prisma.semesterRegistration.findFirst({
-    where: {
-      status: SemesterRegistrationStatus.ONGOING,
-    },
-  });
-
-  const offeredCourse = await prisma.offeredCourse.findFirst({
-    where: {
-      id: payload.offeredCourseId,
-    },
-  });
-
-  const offeredCourseSection = await prisma.offeredCourseSection.findFirst({
-    where: {
-      id: payload.offeredCourseSectionId,
-    },
-  });
-
-  if (!offeredCourseSection) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'offeredCourseSection not found!');
-  }
-
-  if (!offeredCourse) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'offeredCourse not found!');
-  }
-
-  if (!student) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'student not found!');
-  }
-  if (!semesterRegistration) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'semesterRegistration not found!');
-  }
-
-  await prisma.$transaction(async transactionClient => {
-    await transactionClient.studentSemesterRegistrationCourse.create({
-      data: {
-        studentId: student?.id,
-        semesterRegistrationId: semesterRegistration?.id,
-        offeredCourseId: payload.offeredCourseId,
-        offeredCourseSectionId: payload.offeredCourseSectionId,
-      },
-    });
-
-    await transactionClient.offeredCourseSection.update({
-      where: {
-        id: payload.offeredCourseSectionId,
-      },
-      data: {
-        currentlyEnrolledStudent: {
-          increment: 1,
-        },
-      },
-    });
-  });
-
-  return {};
+const withdrewFromCourse = async (
+  authUserId: string,
+  payload: IEnrollCoursePayload
+): Promise<{
+  message: string;
+}> => {
+  return StudentSemesterRegistrationCourse.withdrewFromCourse(
+    authUserId,
+    payload
+  );
 };
 
 export const SemesterRegistrationService = {
@@ -341,5 +297,6 @@ export const SemesterRegistrationService = {
   deleteSemester,
   updateSemester,
   StartMyRegistration,
+  withdrewFromCourse,
   enrollIntoCourse,
 };
