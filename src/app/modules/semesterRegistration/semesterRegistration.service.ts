@@ -288,7 +288,7 @@ const enrollIntoCourse = async (
     },
   });
 
-  const offeredCourseSection = await prisma.offeredCourse.findFirst({
+  const offeredCourseSection = await prisma.offeredCourseSection.findFirst({
     where: {
       id: payload.offeredCourseSectionId,
     },
@@ -316,6 +316,17 @@ const enrollIntoCourse = async (
         semesterRegistrationId: semesterRegistration?.id,
         offeredCourseId: payload.offeredCourseId,
         offeredCourseSectionId: payload.offeredCourseSectionId,
+      },
+    });
+
+    await transactionClient.offeredCourseSection.update({
+      where: {
+        id: payload.offeredCourseSectionId,
+      },
+      data: {
+        currentlyEnrolledStudent: {
+          increment: 1,
+        },
       },
     });
   });
