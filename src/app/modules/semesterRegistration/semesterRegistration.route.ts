@@ -31,10 +31,16 @@ router.post(
   SemesterRegistrationController.StartMyRegistration
 );
 router.post(
-  '/enroll',
+  '/enroll-from-course',
   auth(ENUM_USER_ROLE.STUDENT),
   validateRequest(SemesterRegistrationValidation.enrolledCourse),
   SemesterRegistrationController.enrollIntoCourse
+);
+
+router.post(
+  '/confirmed-my-registration',
+  auth(ENUM_USER_ROLE.STUDENT),
+  SemesterRegistrationController.confirmedMyRegistration
 );
 
 router.post(
