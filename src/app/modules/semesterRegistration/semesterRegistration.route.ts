@@ -7,6 +7,12 @@ import { SemesterRegistrationValidation } from './semesterRegistration.validatio
 
 const router = express.Router();
 
+router.get(
+  '/get-my-reg',
+  auth(ENUM_USER_ROLE.STUDENT),
+  SemesterRegistrationController.GETMyReg
+);
+
 router.get('/', SemesterRegistrationController.getAllSemester);
 router.get('/:id', SemesterRegistrationController.getSingleSemester);
 router.delete('/:id', SemesterRegistrationController.deleteSemester);
