@@ -56,4 +56,10 @@ router.post(
   SemesterRegistrationController.withdrawFromCourse
 );
 
+router.post(
+  '/:id/start-new-registration',
+  // auth(ENUM_USER_ROLE.ADMIN),
+  SemesterRegistrationController.startNewRegistration
+);
+
 export const SemesterRegistrationRoutes = router;
