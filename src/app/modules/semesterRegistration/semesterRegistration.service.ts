@@ -10,6 +10,7 @@ import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
 import { prisma } from '../../../shared/prisma';
+import { asyncForEach } from '../../../shared/utils';
 import { StudentSemesterRegistrationCourse } from '../studentSemesterRegistrationCourse/studentSemesterRegistrationCourse.service';
 import {
   IEnrollCoursePayload,
@@ -405,16 +406,62 @@ const startNewRegistration = async (id: string) => {
     );
   }
 
-  const updatedStatus = await prisma.academicSemester.update({
-    where: {
-      id: semesterRegistration.academicSemester.id,
-    },
-    data: {
-      isCurrent: true,
-    },
+  // if (semesterRegistration.academicSemester.isCurrent) {
+  //   throw new ApiError(httpStatus.BAD_REQUEST, 'semester is already started!');
+  // }
+
+  await prisma.$transaction(async tx => {
+    await tx.academicSemester.updateMany({
+      where: {
+        isCurrent: true,
+      },
+      data: {
+        isCurrent: false,
+      },
+    });
+    await tx.academicSemester.update({
+      where: {
+        id: semesterRegistration.academicSemester.id,
+      },
+      data: {
+        isCurrent: true,
+      },
+    });
+
+    const studentSemesterRegistrations =
+      await prisma.studentSemesterRegistration.findMany({
+        where: {
+          semesterRegistration: {
+            id,
+          },
+          isConfirmed: true,
+        },
+      });
+
+    asyncForEach(
+      studentSemesterRegistrations,
+      async (studentSemReg: StudentSemesterRegistration) => {
+        const studentSemesterRegistrationCourses =
+          await prisma.studentSemesterRegistrationCourse.findMany({
+            where: {
+              semesterRegistration: {
+                id,
+              },
+              student: {
+                id: studentSemReg.studentId,
+              },
+            },
+            include: {
+              offeredCourse: {
+                include: { course: true },
+              },
+            },
+          });
+        console.log(studentSemesterRegistrationCourses);
+      }
+    );
   });
-  return updatedStatus;
-  console.log(semesterRegistration);
+  return { message: 'Semester started successfully!' };
 };
 
 export const SemesterRegistrationService = {
