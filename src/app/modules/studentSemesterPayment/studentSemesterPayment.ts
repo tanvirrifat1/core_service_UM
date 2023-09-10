@@ -3,8 +3,6 @@ import {
   DefaultArgs,
   PrismaClientOptions,
 } from '@prisma/client/runtime/library';
-import httpStatus from 'http-status';
-import ApiError from '../../../errors/ApiError';
 
 const createSemesterPayment = async (
   prismaClient: Omit<
@@ -41,9 +39,10 @@ const createSemesterPayment = async (
     await prismaClient.studentSemesterPayment.create({
       data: dataToInsert,
     });
-  } else if (isExist) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'payment already exist!');
   }
+  // else if ( isExist ) {
+  //   throw new ApiError(httpStatus.BAD_REQUEST, 'payment already exist!');
+  // }
 };
 
 export const StudentSemesterPaymentService = {
