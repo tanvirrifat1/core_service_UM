@@ -1,8 +1,11 @@
 import {
+  Course,
+  OfferedCourse,
   Prisma,
   SemesterRegistration,
   SemesterRegistrationStatus,
   StudentSemesterRegistration,
+  StudentSemesterRegistrationCourse,
 } from '@prisma/client';
 import httpStatus from 'http-status';
 import ApiError from '../../../errors/ApiError';
@@ -11,7 +14,7 @@ import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
 import { prisma } from '../../../shared/prisma';
 import { asyncForEach } from '../../../shared/utils';
-import { StudentSemesterRegistrationCourse } from '../studentSemesterRegistrationCourse/studentSemesterRegistrationCourse.service';
+import { StudentSemesterRegistrationCoursed } from '../studentSemesterRegistrationCourse/studentSemesterRegistrationCourse.service';
 import {
   IEnrollCoursePayload,
   ISemesterRegistrationFilterRequest,
@@ -273,7 +276,7 @@ const enrollIntoCourse = async (
 ): Promise<{
   message: string;
 }> => {
-  return StudentSemesterRegistrationCourse.enrollIntoCourse(
+  return StudentSemesterRegistrationCoursed.enrollIntoCourse(
     authUserId,
     payload
   );
@@ -285,7 +288,7 @@ const withdrewFromCourse = async (
 ): Promise<{
   message: string;
 }> => {
-  return StudentSemesterRegistrationCourse.withdrewFromCourse(
+  return StudentSemesterRegistrationCoursed.withdrewFromCourse(
     authUserId,
     payload
   );
@@ -382,7 +385,11 @@ const GETMyReg = async (authUserId: string) => {
   return { semesterRegistration, studentSemesterRegistration };
 };
 
-const startNewRegistration = async (id: string) => {
+const startNewRegistration = async (
+  id: string
+): Promise<{
+  message: string;
+}> => {
   const semesterRegistration = await prisma.semesterRegistration.findUnique({
     where: {
       id,
@@ -406,9 +413,9 @@ const startNewRegistration = async (id: string) => {
     );
   }
 
-  // if (semesterRegistration.academicSemester.isCurrent) {
-  //   throw new ApiError(httpStatus.BAD_REQUEST, 'semester is already started!');
-  // }
+  if (semesterRegistration.academicSemester.isCurrent) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'semester is already started!');
+  }
 
   await prisma.$transaction(async tx => {
     await tx.academicSemester.updateMany({
@@ -438,7 +445,7 @@ const startNewRegistration = async (id: string) => {
         },
       });
 
-    asyncForEach(
+    await asyncForEach(
       studentSemesterRegistrations,
       async (studentSemReg: StudentSemesterRegistration) => {
         const studentSemesterRegistrationCourses =
@@ -457,7 +464,39 @@ const startNewRegistration = async (id: string) => {
               },
             },
           });
-        console.log(studentSemesterRegistrationCourses);
+
+        await asyncForEach(
+          studentSemesterRegistrationCourses,
+          async (
+            item: StudentSemesterRegistrationCourse & {
+              offeredCourse: OfferedCourse & {
+                course: Course;
+              };
+            }
+          ) => {
+            const isExist = await prisma.studentEnrolledCourse.findFirst({
+              where: {
+                studentId: item.studentId,
+                courseId: item.offeredCourse.courseId,
+                academicSemesterId: semesterRegistration.academicSemesterId,
+              },
+            });
+
+            if (!isExist) {
+              const enrolledCourseData = {
+                studentId: item.studentId,
+                courseId: item.offeredCourse.courseId,
+                academicSemesterId: semesterRegistration.academicSemesterId,
+              };
+
+              await prisma.studentEnrolledCourse.create({
+                data: enrolledCourseData,
+              });
+            } else if (isExist) {
+              throw new ApiError(httpStatus.BAD_REQUEST, 'already exist!');
+            }
+          }
+        );
       }
     );
   });

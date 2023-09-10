@@ -193,7 +193,7 @@ const withdrewFromCourse = async (
   };
 };
 
-export const StudentSemesterRegistrationCourse = {
+export const StudentSemesterRegistrationCoursed = {
   enrollIntoCourse,
   withdrewFromCourse,
 };
