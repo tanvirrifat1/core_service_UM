@@ -459,7 +459,7 @@ const startNewRegistration = async (
         }
 
         const studentSemesterRegistrationCourses =
-          await prisma.studentSemesterRegistrationCourse.findMany({
+          await tx.studentSemesterRegistrationCourse.findMany({
             where: {
               semesterRegistration: {
                 id,
@@ -484,7 +484,7 @@ const startNewRegistration = async (
               };
             }
           ) => {
-            const isExist = await prisma.studentEnrolledCourse.findFirst({
+            const isExist = await tx.studentEnrolledCourse.findFirst({
               where: {
                 studentId: item.studentId,
                 courseId: item.offeredCourse.courseId,
@@ -499,7 +499,7 @@ const startNewRegistration = async (
                 academicSemesterId: semesterRegistration.academicSemesterId,
               };
 
-              await prisma.studentEnrolledCourse.create({
+              await tx.studentEnrolledCourse.create({
                 data: enrolledCourseData,
               });
             }
