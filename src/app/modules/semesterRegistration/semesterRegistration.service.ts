@@ -14,6 +14,7 @@ import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
 import { prisma } from '../../../shared/prisma';
 import { asyncForEach } from '../../../shared/utils';
+import { StudentSemesterPaymentService } from '../studentSemesterPayment/studentSemesterPayment';
 import { StudentSemesterRegistrationCoursed } from '../studentSemesterRegistrationCourse/studentSemesterRegistrationCourse.service';
 import {
   IEnrollCoursePayload,
@@ -413,9 +414,9 @@ const startNewRegistration = async (
     );
   }
 
-  if (semesterRegistration.academicSemester.isCurrent) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'semester is already started!');
-  }
+  // if (semesterRegistration.academicSemester.isCurrent) {
+  //   throw new ApiError(httpStatus.BAD_REQUEST, 'semester is already started!');
+  // }
 
   await prisma.$transaction(async tx => {
     await tx.academicSemester.updateMany({
@@ -448,6 +449,15 @@ const startNewRegistration = async (
     await asyncForEach(
       studentSemesterRegistrations,
       async (studentSemReg: StudentSemesterRegistration) => {
+        if (studentSemReg.totalCreditsTaken) {
+          const totalPaymentAmount = studentSemReg.totalCreditsTaken * 5000;
+          await StudentSemesterPaymentService.createSemesterPayment(tx, {
+            studentId: studentSemReg.studentId,
+            academicSemesterId: semesterRegistration.academicSemesterId,
+            totalPaymentAmount: totalPaymentAmount,
+          });
+        }
+
         const studentSemesterRegistrationCourses =
           await prisma.studentSemesterRegistrationCourse.findMany({
             where: {
@@ -492,8 +502,6 @@ const startNewRegistration = async (
               await prisma.studentEnrolledCourse.create({
                 data: enrolledCourseData,
               });
-            } else if (isExist) {
-              throw new ApiError(httpStatus.BAD_REQUEST, 'already exist!');
             }
           }
         );
