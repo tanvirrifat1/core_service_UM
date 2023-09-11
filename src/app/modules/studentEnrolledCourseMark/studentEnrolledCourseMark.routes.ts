@@ -8,4 +8,10 @@ router.patch(
   StudentEnrolledCourseMarkController.updateStudentMarks
 );
 
+router.get(
+  '/',
+  // auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.FACULTY),
+  StudentEnrolledCourseMarkController.getAllFromDB
+);
+
 export const StudentEnrolledCourseMarkRoutes = router;
