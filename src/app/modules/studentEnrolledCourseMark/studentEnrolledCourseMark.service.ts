@@ -2,6 +2,7 @@ import {
   ExamType,
   PrismaClient,
   StudentEnrolledCourseMark,
+  StudentEnrolledCourseStatus,
 } from '@prisma/client';
 import {
   DefaultArgs,
@@ -245,15 +246,80 @@ const updateFinalMarks = async (payload: any) => {
     studentEnrolledCourseMarks.find(item => item.examType === ExamType.FINAL)
       ?.marks || 0;
 
-  console.log(midTermMarks, finalTermMarks);
-
   const totalFinalMarks =
     Math.ceil(midTermMarks * 0.4) + Math.ceil(finalTermMarks * 0.6);
 
-  const grade =
+  const result =
     StudentEnrolledCourseMarkUtils.getGradeFromMarks(totalFinalMarks);
 
-  console.log(grade);
+  await prisma.studentEnrolledCourse.updateMany({
+    where: {
+      student: {
+        id: studentId,
+      },
+      academicSemester: {
+        id: academicSemesterId,
+      },
+      course: {
+        id: courseId,
+      },
+    },
+    data: {
+      grade: result.grade,
+      point: result.point,
+      totalMarks: totalFinalMarks,
+      status: StudentEnrolledCourseStatus.COMPLETED,
+    },
+  });
+
+  const grades = await prisma.studentEnrolledCourse.findMany({
+    where: {
+      student: {
+        id: studentId,
+      },
+
+      status: StudentEnrolledCourseStatus.COMPLETED,
+    },
+    include: { course: true },
+  });
+
+  const academicResult = await StudentEnrolledCourseMarkUtils.calcCGPAandGrade(
+    grades
+  );
+
+  const studentAcademicInfo = await prisma.studentAcademicInfo.findFirst({
+    where: {
+      student: {
+        id: studentId,
+      },
+    },
+  });
+
+  if (studentAcademicInfo) {
+    await prisma.studentAcademicInfo.update({
+      where: {
+        id: studentAcademicInfo.id,
+      },
+      data: {
+        totalCompletedCredit: academicResult.totalCompletedCredit,
+        cgpa: academicResult.cgpa,
+      },
+    });
+  } else {
+    await prisma.studentAcademicInfo.create({
+      data: {
+        student: {
+          connect: {
+            id: studentId,
+          },
+        },
+        totalCompletedCredit: academicResult.totalCompletedCredit,
+        cgpa: academicResult.cgpa,
+      },
+    });
+  }
+
+  return grades;
 };
 
 export const StudentEnrolledCourseMarkService = {
