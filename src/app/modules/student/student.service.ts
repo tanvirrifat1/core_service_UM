@@ -22,6 +22,40 @@ const insertIntoDB = async (data: Student): Promise<Student> => {
   return result;
 };
 
+const myCourses = async (
+  authUserId: string,
+  filter: {
+    courseId?: string | undefined;
+    academicSemesterId?: string | undefined;
+  }
+) => {
+  console.log(authUserId, 'auth');
+  console.log(filter, 'filter');
+  if (!filter.academicSemesterId) {
+    const currentSemester = await prisma.academicSemester.findFirst({
+      where: {
+        isCurrent: true,
+      },
+    });
+    filter.academicSemesterId = currentSemester?.id;
+  }
+
+  const result = await prisma.studentEnrolledCourse.findMany({
+    where: {
+      student: {
+        studentId: authUserId,
+      },
+      ...filter,
+    },
+    include: {
+      course: true,
+    },
+  });
+  console.log(result);
+
+  return result;
+};
+
 const getAllFromDB = async (
   filters: IStudentFilterRequest,
   options: IPaginationOptions
@@ -147,4 +181,5 @@ export const StudentService = {
   getByIdFromDB,
   updateIntoDB,
   deleteFromDB,
+  myCourses,
 };

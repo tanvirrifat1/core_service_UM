@@ -7,9 +7,13 @@ import { StudentValidation } from './student.validation';
 
 const router = express.Router();
 
-router.get('/', StudentController.getAllFromDB);
+router.get(
+  '/my-courses',
+  auth(ENUM_USER_ROLE.STUDENT),
+  StudentController.myCourses
+);
 
-router.get('/:id', StudentController.getByIdFromDB);
+// router.get('/:id', StudentController.getByIdFromDB);
 
 router.post(
   '/create-student',
@@ -29,5 +33,7 @@ router.delete(
   auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
   StudentController.deleteFromDB
 );
+
+router.get('/', StudentController.getAllFromDB);
 
 export const studentRoutes = router;
