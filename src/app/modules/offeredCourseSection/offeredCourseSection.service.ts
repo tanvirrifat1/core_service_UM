@@ -28,6 +28,7 @@ const insertIntoDb = async (
       id: data.offeredCourseId,
     },
   });
+
   if (!isExistOfferedCourse) {
     throw new ApiError(
       httpStatus.BAD_REQUEST,
@@ -35,39 +36,34 @@ const insertIntoDb = async (
     );
   }
 
-  // data.semesterRegistrationId = isExistOfferedCourse.semesterRegistrationId;
-
   await asyncForEach(classSchedules, async (schedule: any) => {
-    await OfferedCourseClassScheduleUtils.checkRoomAvaileAble(schedule);
+    await OfferedCourseClassScheduleUtils.checkRoomAvailable(schedule);
     await OfferedCourseClassScheduleUtils.checkFacultyAvailable(schedule);
   });
 
-  const offeredCourseSectionData = await prisma.offeredCourseSection.findFirst({
+  const offerCourseSectionData = await prisma.offeredCourseSection.findFirst({
     where: {
       offeredCourse: {
-        id: data.offeredCourseId,
+        id: data?.offeredCourseId,
       },
-      title: data.title,
+      title: data?.title,
     },
   });
 
-  if (offeredCourseSectionData) {
-    throw new ApiError(
-      httpStatus.BAD_REQUEST,
-      'Offered Course data already exist!'
-    );
+  if (offerCourseSectionData) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Course Section already exists');
   }
+
   const createSection = await prisma.$transaction(async transactionClient => {
-    const createOfferedCourseSection = await prisma.offeredCourseSection.create(
-      {
+    const createOfferedCourseSection =
+      await transactionClient.offeredCourseSection.create({
         data: {
           title: data.title,
           maxCapacity: data.maxCapacity,
           offeredCourseId: data.offeredCourseId,
           semesterRegistrationId: isExistOfferedCourse.semesterRegistrationId,
         },
-      }
-    );
+      });
 
     const scheduleData = classSchedules.map((schedule: IClassSchedule) => ({
       startTime: schedule.startTime,

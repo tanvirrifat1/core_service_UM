@@ -4,7 +4,7 @@ import ApiError from '../../../errors/ApiError';
 import { prisma } from '../../../shared/prisma';
 import hasTimeConflict from '../../../shared/utils';
 
-const checkRoomAvaileAble = async (data: OfferedCourseClassSchedule) => {
+const checkRoomAvailable = async (data: OfferedCourseClassSchedule) => {
   const alreadyBookedRoomOnDay =
     await prisma.offeredCourseClassSchedule.findMany({
       where: {
@@ -32,21 +32,18 @@ const checkRoomAvaileAble = async (data: OfferedCourseClassSchedule) => {
   }
 };
 
-// faculty
-
 const checkFacultyAvailable = async (data: OfferedCourseClassSchedule) => {
-  const alreadyFacultyAssign = await prisma.offeredCourseClassSchedule.findMany(
-    {
+  const alreadyFcultyAssigned =
+    await prisma.offeredCourseClassSchedule.findMany({
       where: {
         dayOfWeek: data.dayOfWeek,
         faculty: {
           id: data.facultyId,
         },
       },
-    }
-  );
+    });
 
-  const existingSlots = alreadyFacultyAssign.map(schedule => ({
+  const existingSlots = alreadyFcultyAssigned.map(schedule => ({
     startTime: schedule.startTime,
     endTime: schedule.endTime,
     dayOfWeek: schedule.dayOfWeek,
@@ -61,11 +58,9 @@ const checkFacultyAvailable = async (data: OfferedCourseClassSchedule) => {
   if (hasTimeConflict(existingSlots, newSlot)) {
     throw new ApiError(httpStatus.CONFLICT, 'Faculty is already booked!');
   }
-
-  // console.log(alreadyFacultyAssign);
 };
 
 export const OfferedCourseClassScheduleUtils = {
-  checkRoomAvaileAble,
+  checkRoomAvailable,
   checkFacultyAvailable,
 };

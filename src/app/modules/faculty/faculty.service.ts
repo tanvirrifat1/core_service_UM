@@ -187,6 +187,7 @@ const myCourses = async (
     courseId?: string | null | undefined;
   }
 ) => {
+  // console.log(authUser.userId);
   if (!filter.academicSemesterId) {
     const currentSemester = await prisma.academicSemester.findFirst({
       where: {
@@ -230,7 +231,37 @@ const myCourses = async (
       },
     },
   });
-  console.log(offeredCourseSections);
+  const courseAndSchedule = offeredCourseSections.reduce(
+    (acc: any, obj: any) => {
+      //console.log(obj)
+
+      const course = obj.offeredCourse.course;
+      const classSchedules = obj.offeredCourseClassSchedules;
+
+      const existingCourse = acc.find(
+        (item: any) => item.couse?.id === course?.id
+      );
+      if (existingCourse) {
+        existingCourse.sections.push({
+          section: obj,
+          classSchedules,
+        });
+      } else {
+        acc.push({
+          course,
+          sections: [
+            {
+              section: obj,
+              classSchedules,
+            },
+          ],
+        });
+      }
+      return acc;
+    },
+    []
+  );
+  return courseAndSchedule;
 };
 
 export const FacultyService = {
