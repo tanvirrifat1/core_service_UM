@@ -233,8 +233,6 @@ const myCourses = async (
   });
   const courseAndSchedule = offeredCourseSections.reduce(
     (acc: any, obj: any) => {
-      //console.log(obj)
-
       const course = obj.offeredCourse.course;
       const classSchedules = obj.offeredCourseClassSchedules;
 
