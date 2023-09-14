@@ -1,4 +1,4 @@
-import { CourseFaculty, Faculty, Prisma } from '@prisma/client';
+import { CourseFaculty, Faculty, Prisma, Student } from '@prisma/client';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
@@ -8,7 +8,10 @@ import {
   facultyRelationalFieldsMapper,
   facultySearchableFields,
 } from './faculty.constants';
-import { IFacultyFilterRequest } from './faculty.interface';
+import {
+  IFacultyFilterRequest,
+  IFacultyMyCourseStudentsRequest,
+} from './faculty.interface';
 
 const interIntoDb = async (data: Faculty): Promise<Faculty> => {
   const result = await prisma.faculty.create({
@@ -262,8 +265,88 @@ const myCourses = async (
   return courseAndSchedule;
 };
 
+const getMyCourseStudents = async (
+  filters: IFacultyMyCourseStudentsRequest,
+  options: IPaginationOptions,
+  authUser: any
+): Promise<IGenericResponse<Student[]>> => {
+  const { limit, page, skip } = paginationHelpers.calculatePagination(options);
+
+  if (!filters.academicSemesterId) {
+    const currentAcademicSemester = await prisma.academicSemester.findFirst({
+      where: {
+        isCurrent: true,
+      },
+    });
+
+    if (currentAcademicSemester) {
+      filters.academicSemesterId = currentAcademicSemester.id;
+    }
+  }
+
+  const offeredCourseSections =
+    await prisma.studentSemesterRegistrationCourse.findMany({
+      where: {
+        offeredCourse: {
+          course: {
+            id: filters.courseId,
+          },
+        },
+        offeredCourseSection: {
+          offeredCourse: {
+            semesterRegistration: {
+              academicSemester: {
+                id: filters.academicSemesterId,
+              },
+            },
+          },
+          id: filters.offeredCourseSectionId,
+        },
+      },
+      include: {
+        student: true,
+      },
+      take: limit,
+      skip,
+    });
+
+  const students = offeredCourseSections.map(
+    offeredCourseSection => offeredCourseSection.student
+  );
+
+  const total = await prisma.studentSemesterRegistrationCourse.count({
+    where: {
+      offeredCourse: {
+        course: {
+          id: filters.courseId,
+        },
+      },
+      offeredCourseSection: {
+        offeredCourse: {
+          semesterRegistration: {
+            academicSemester: {
+              id: filters.academicSemesterId,
+            },
+          },
+        },
+        id: filters.offeredCourseSectionId,
+      },
+    },
+  });
+
+  return {
+    meta: {
+      total,
+      page,
+      limit,
+    },
+    data: students,
+  };
+};
+
 export const FacultyService = {
   interIntoDb,
+  getMyCourseStudents,
   getAllFaculty,
   getSingleFaculty,
   updatedFaculty,
