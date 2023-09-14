@@ -9,6 +9,7 @@ import {
   studentSearchableFields,
 } from './student.contants';
 import { IStudentFilterRequest } from './student.interface';
+import { StudentUtils } from './student.utils';
 
 const insertIntoDB = async (data: Student): Promise<Student> => {
   const result = await prisma.student.create({
@@ -262,7 +263,13 @@ const getAcademicInfo = async (authUserId: string): Promise<any> => {
       createdAt: 'desc',
     },
   });
-  console.log(enrollCourses);
+  const groupByAcademicSemesterData =
+    StudentUtils.groupByAcademicSemester(enrollCourses);
+
+  return {
+    academicInfo,
+    course: groupByAcademicSemesterData,
+  };
 };
 
 export const StudentService = {
