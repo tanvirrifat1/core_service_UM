@@ -22,6 +22,7 @@ import {
   IEnrollCoursePayload,
   ISemesterRegistrationFilterRequest,
 } from './semesterRegistration.interface';
+import { SemesterRegistrationUtils } from './semesterRegistration.ultis';
 import {
   semesterRegistrationRelationalFields,
   semesterRegistrationRelationalFieldsMapper,
@@ -549,7 +550,7 @@ const getMySemesterRegCourses = async (authUserId: string) => {
     );
   }
 
-  const studentEnrolledCourse = await prisma.studentEnrolledCourse.findMany({
+  const studentCompletedCourse = await prisma.studentEnrolledCourse.findMany({
     where: {
       status: StudentEnrolledCourseStatus.COMPLETED,
       student: {
@@ -610,8 +611,14 @@ const getMySemesterRegCourses = async (authUserId: string) => {
       },
     },
   });
+  // console.log('Offered course: ', offeredCourse);
 
-  console.log('Offered course: ', offeredCourse);
+  const availableCourses = SemesterRegistrationUtils.getAvailableCourse(
+    offeredCourse,
+    studentCompletedCourse,
+    studentCurrentSemesterTakenCourse
+  );
+  return availableCourses;
 };
 
 export const SemesterRegistrationService = {
