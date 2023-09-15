@@ -1,16 +1,34 @@
 import { AcademicSemester, Prisma } from '@prisma/client';
+import httpStatus from 'http-status';
+import ApiError from '../../../errors/ApiError';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
 import { prisma } from '../../../shared/prisma';
+import { RedisClient } from '../../../shared/redis';
+import {
+  EVENT_ACADEMIC_SEMESTER_CREATED,
+  academicSemesterTitleCodeMapper,
+} from './academicSemester.constant';
 import { IAcademicSemesterFilterRequest } from './academicSemester.interface';
 
 const insertIntoDb = async (
   data: AcademicSemester
 ): Promise<AcademicSemester> => {
+  if (academicSemesterTitleCodeMapper[data.title] !== data.code) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid semester code!');
+  }
   const result = await prisma.academicSemester.create({
     data,
   });
+
+  if (result) {
+    await RedisClient.publish(
+      EVENT_ACADEMIC_SEMESTER_CREATED,
+      JSON.stringify(result)
+    );
+  }
+
   return result;
 };
 
@@ -21,7 +39,6 @@ const getAllSemester = async (
   const { page, limit, skip } = paginationHelpers.calculatePagination(options);
   const { searchTerm, ...filterData } = filters;
 
-  console.log('options', options);
   // conditions
   const andConditions = [];
 

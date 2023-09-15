@@ -25,7 +25,8 @@ router.patch(
 );
 
 router.post(
-  '/create-semester',
+  '/',
+  auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
   validateRequest(academicSemesterValidation.createSchema),
   AcademicSemesterController.insertIntoDb
 );
