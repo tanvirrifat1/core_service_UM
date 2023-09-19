@@ -108,7 +108,7 @@ const updatedFaculty = async (
   });
 
   if (result) {
-    await RedisClient.subscribe(
+    await RedisClient.publish(
       EVENT_ACADEMIC_FACULTY_UPDATED,
       JSON.stringify(result)
     );
