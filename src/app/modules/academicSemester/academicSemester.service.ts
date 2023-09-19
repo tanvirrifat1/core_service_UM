@@ -8,6 +8,8 @@ import { prisma } from '../../../shared/prisma';
 import { RedisClient } from '../../../shared/redis';
 import {
   EVENT_ACADEMIC_SEMESTER_CREATED,
+  EVENT_ACADEMIC_SEMESTER_DELETED,
+  EVENT_ACADEMIC_SEMESTER_UPDATED,
   academicSemesterTitleCodeMapper,
 } from './academicSemester.constant';
 import { IAcademicSemesterFilterRequest } from './academicSemester.interface';
@@ -107,6 +109,12 @@ const deleteSemester = async (id: string): Promise<AcademicSemester | null> => {
   const result = await prisma.academicSemester.delete({
     where: { id },
   });
+  if (result) {
+    await RedisClient.subscribe(
+      EVENT_ACADEMIC_SEMESTER_DELETED,
+      JSON.stringify(result)
+    );
+  }
   return result;
 };
 
@@ -114,10 +122,23 @@ const updateData = async (
   id: string,
   payload: Partial<AcademicSemester>
 ): Promise<AcademicSemester | null> => {
+  if (
+    typeof payload.title === 'string' &&
+    academicSemesterTitleCodeMapper[payload.title] !== payload.code
+  ) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid semester code!');
+  }
   const result = await prisma.academicSemester.update({
     where: { id },
     data: payload,
   });
+
+  if (result) {
+    await RedisClient.subscribe(
+      EVENT_ACADEMIC_SEMESTER_UPDATED,
+      JSON.stringify(result)
+    );
+  }
 
   return result;
 };

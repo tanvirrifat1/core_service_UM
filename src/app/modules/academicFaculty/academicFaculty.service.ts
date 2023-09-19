@@ -6,6 +6,8 @@ import { prisma } from '../../../shared/prisma';
 import { RedisClient } from '../../../shared/redis';
 import {
   EVENT_ACADEMIC_FACULTY_CREATED,
+  EVENT_ACADEMIC_FACULTY_DELETED,
+  EVENT_ACADEMIC_FACULTY_UPDATED,
   academicFacultySearchableFields,
 } from './academicFaculty.contants';
 import { IAcademicFacultyFilterRequest } from './academicFaculty.interface';
@@ -104,6 +106,14 @@ const updatedFaculty = async (
     },
     data: payload,
   });
+
+  if (result) {
+    await RedisClient.subscribe(
+      EVENT_ACADEMIC_FACULTY_UPDATED,
+      JSON.stringify(result)
+    );
+  }
+
   return result;
 };
 
@@ -113,6 +123,12 @@ const deleteFaculty = async (id: string): Promise<AcademicFaculty | null> => {
       id: id,
     },
   });
+  if (result) {
+    await RedisClient.subscribe(
+      EVENT_ACADEMIC_FACULTY_DELETED,
+      JSON.stringify(result)
+    );
+  }
   return result;
 };
 
