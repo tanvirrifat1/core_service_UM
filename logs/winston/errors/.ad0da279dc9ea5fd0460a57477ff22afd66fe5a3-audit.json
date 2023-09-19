@@ -29,6 +29,26 @@
             "date": 1694802050542,
             "name": "C:\\projects\\UM-core-service\\logs\\winston\\errors\\phu-2023-16-09-00-error.log",
             "hash": "6344ed5b3f0d32a08a989241c487d720b75fda20952bf4f921ac386e62fd050f"
+        },
+        {
+            "date": 1695093548202,
+            "name": "C:\\projects\\UM-core-service\\logs\\winston\\errors\\phu-2023-19-09-09-error.log",
+            "hash": "d2313e960fb52a00c349e26176a4c3001bbae0d44b25d4a6788fa91f535f7f69"
+        },
+        {
+            "date": 1695101531156,
+            "name": "C:\\projects\\UM-core-service\\logs\\winston\\errors\\phu-2023-19-09-11-error.log",
+            "hash": "ed575941ded799657a0178591c274490077d06e90239f44e74e4c9ddf9228317"
+        },
+        {
+            "date": 1695111746228,
+            "name": "C:\\projects\\UM-core-service\\logs\\winston\\errors\\phu-2023-19-09-14-error.log",
+            "hash": "0d25ef364d6cb5ed46a08b963d24a16eb30f68b126efb7f6be95b70d3a3d111c"
+        },
+        {
+            "date": 1695118494976,
+            "name": "C:\\projects\\UM-core-service\\logs\\winston\\errors\\phu-2023-19-09-16-error.log",
+            "hash": "af89a66e3ce7866e0af9c401b419a1456dc237d955623449302e6fbf4c2c8415"
         }
     ],
     "hashType": "sha256"
