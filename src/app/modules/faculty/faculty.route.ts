@@ -37,7 +37,7 @@ router.delete(
 );
 
 router.post(
-  '/create-faculty',
+  '/',
   validateRequest(FacultyValidation.create),
   FacultyController.interIntoDb
 );

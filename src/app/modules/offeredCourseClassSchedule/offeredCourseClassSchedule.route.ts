@@ -11,9 +11,9 @@ router.get('/', OfferedCourseClassScheduleController.getAllFromDB);
 router.get('/:id', OfferedCourseClassScheduleController.getByIdFromDB);
 
 router.post(
-  '/create',
+  '/',
   validateRequest(OfferedCourseClassScheduleValidation.create),
-  // auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
   OfferedCourseClassScheduleController.insertIntoDB
 );
 

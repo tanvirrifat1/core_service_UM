@@ -15,7 +15,7 @@ router.patch(
 );
 
 router.post(
-  '/create',
+  '/',
   validateRequest(OfferedCourseSectionValidation.create),
   OfferedCourseSectionController.insertIntoDb
 );

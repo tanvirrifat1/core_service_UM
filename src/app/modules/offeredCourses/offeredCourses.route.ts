@@ -15,7 +15,7 @@ router.patch(
 );
 
 router.post(
-  '/create-course',
+  '/',
   validateRequest(OfferedCourseValidations.create),
   OfferedCourseController.insertIntoDB
 );

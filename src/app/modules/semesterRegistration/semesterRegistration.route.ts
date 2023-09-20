@@ -29,7 +29,7 @@ router.patch(
 );
 
 router.post(
-  '/create-semester',
+  '/',
   validateRequest(SemesterRegistrationValidation.create),
   SemesterRegistrationController.insertIntoDb
 );
@@ -64,7 +64,7 @@ router.post(
 
 router.post(
   '/:id/start-new-registration',
-  // auth(ENUM_USER_ROLE.ADMIN),
+  auth(ENUM_USER_ROLE.ADMIN),
   SemesterRegistrationController.startNewRegistration
 );
 
