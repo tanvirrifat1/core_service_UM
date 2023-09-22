@@ -99,6 +99,11 @@
             "date": 1695201288642,
             "name": "C:\\projects\\UM-core-service\\logs\\winston\\successes\\phu-2023-20-09-15-success.log",
             "hash": "5f60a557b19f8ac0d60349a90c21e1ce3850148bcb3887379d1bb4771e379300"
+        },
+        {
+            "date": 1695316387595,
+            "name": "C:\\projects\\UM-core-service\\logs\\winston\\successes\\phu-2023-21-09-23-success.log",
+            "hash": "d6bd1235a5a800632a84d367c80b4ff282f0fd1f47680bb7a6eadb96b6226537"
         }
     ],
     "hashType": "sha256"

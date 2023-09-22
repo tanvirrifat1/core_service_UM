@@ -99,6 +99,11 @@
             "date": 1695201288649,
             "name": "C:\\projects\\UM-core-service\\logs\\winston\\errors\\phu-2023-20-09-15-error.log",
             "hash": "3f3bed48b0e1b58b7a12596ab03b8397efad53bed46508346f22d751f223d9bd"
+        },
+        {
+            "date": 1695316387617,
+            "name": "C:\\projects\\UM-core-service\\logs\\winston\\errors\\phu-2023-21-09-23-error.log",
+            "hash": "cb13f85e585bc1a04eee5879ebf3ca634596e264aa9fbde83615e65c3e795d98"
         }
     ],
     "hashType": "sha256"
